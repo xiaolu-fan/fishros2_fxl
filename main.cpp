@@ -8,4 +8,5 @@ int main(int agrc, char **agrv)
 	std::cout << "fifth_day" << std::endl;
 
 	std::cout << "task_day1" << std::endl;
+	std::cout << "task_day2" << std::endl;
 }
