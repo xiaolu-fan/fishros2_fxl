@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'first_python_node = demo_python_pkg.python_node:main'
+            'first_python_node = demo_python_pkg.python_node:main',
+            'learn_thread = demo_python_pkg.learn_thread:main'
         ],
     },
 )

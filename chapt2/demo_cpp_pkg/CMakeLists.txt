@@ -9,17 +9,22 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 
+include_directories(include())
+
 add_executable(first_cpp_node src/cpp_node.cpp)
+add_executable(learn_thread src/learn_thread.cpp)
 # 依赖于 rclcpp头文件和库文件
 # 其中“##” 表示原来注释掉
 ##target_include_directories(first_cpp_node PUBLIC ${rclcpp_INCLUDE_DIRS})
 ##target_link_libraries(first_cpp_node ${rclcpp_LIBRARIES})
 # ament_cmake 可以代替前两行
 ament_target_dependencies(first_cpp_node rclcpp)
+# ament_target_dependencies(learn_thread rclcpp)
 
 # 需要安装
 install(TARGETS
   first_cpp_node
+  learn_thread
   DESTINATION lib/${PROJECT_NAME}
 )
 
