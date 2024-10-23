@@ -19,7 +19,7 @@ class NovelSubNode(Node):
         
     def speak_thread(self):
         speaker = espeakng.Speaker()
-        speaker.voice = 'en'
+        speaker.voice = 'zh'
         while rclpy.ok():
             if self.novels_queue_.qsize() > 0:
                 text = self.novels_queue_.get()

@@ -24,11 +24,20 @@ class NovelPubNode(Node):
         self.get_logger().info(f'下载完成：{url}')
         for line in response.text.splitlines():
             self.novels_queue_.put(line)
+    
+    def read_novel(self,url):
+        with open(url, 'r', encoding='utf-8') as file:
+            lines = file.readlines()  # 读取所有行并存储为列表
+        for line in lines:
+            # print(f'内容：{line}')
+            self.novels_queue_.put(line)
+
             
 def main():
     rclpy.init()        
     node = NovelPubNode('novel_pub')
-    node.download_novel('http://localhost:8000/novel11.txt')
+    # node.download_novel('http://localhost:8000/novel11.txt')
+    node.read_novel('/home/zkhl/fishros_book/fishros2_fxl/chapt3/topic_ws/src/demo_python_topic/novel11.txt')
     
     rclpy.spin(node)
     rclpy.shutdown()
