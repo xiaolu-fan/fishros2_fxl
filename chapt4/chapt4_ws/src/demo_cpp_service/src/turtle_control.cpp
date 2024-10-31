@@ -2,7 +2,9 @@
 #include "geometry_msgs/msg/twist.hpp"
 #include "turtlesim/msg/pose.hpp"
 #include "chapt4_interfaces/srv/patrol.hpp"
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 
+using SetParametersResult = rcl_interfaces::msg::SetParametersResult;
 using Patrol = chapt4_interfaces::srv::Patrol;
 using namespace std::placeholders;
 class TurtleControl : public rclcpp::Node
@@ -11,9 +13,16 @@ public:
     TurtleControl(const std::string node_name) : Node(node_name)
     {
         RCLCPP_INFO(this->get_logger(), "启动一个节点,名字是：%s", node_name.c_str());
+
+        this->declare_parameter("k", 1.0);
+        this->declare_parameter("max_speed", 3.0);
+        this->get_parameter("k", this->k_);
+        this->get_parameter("max_speed", this->max_speed_);
+
         pub_ = this->create_publisher<geometry_msgs::msg::Twist>("/turtle1/cmd_vel", 10);
         sub_ = this->create_subscription<turtlesim::msg::Pose>("turtle1/pose", 10, std::bind(&TurtleControl::on_pose_received, this, std::placeholders::_1));
         patrol_service_ = this->create_service<Patrol>("patrol", std::bind(&TurtleControl::service_callback, this, _1, _2));
+        parameters_callback_handle_ = this->add_on_set_parameters_callback(std::bind(&TurtleControl::Parameters_callback, this, _1));
     }
 
 private:
@@ -61,10 +70,31 @@ private:
         }
     }
 
+    SetParametersResult Parameters_callback(const std::vector<rclcpp::Parameter> &params)
+    {
+        for (auto param : params)
+        {
+            RCLCPP_INFO(this->get_logger(), "server根新参数 %s 值为 %f", param.get_name().c_str(), param.as_double());
+            if (param.get_name() == "k")
+            {
+                k_ = param.as_double();
+            }
+            else if (param.get_name() == "max_speed")
+            {
+                max_speed_ = param.as_double();
+            }
+        }
+
+        auto res = SetParametersResult();
+        res.successful = true;
+        return res;
+    }
+
 private:
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr pub_;
     rclcpp::Subscription<turtlesim::msg::Pose>::SharedPtr sub_;
     rclcpp::Service<Patrol>::SharedPtr patrol_service_;
+    OnSetParametersCallbackHandle::SharedPtr parameters_callback_handle_;
 
     double target_x_{1.0};
     double target_y_{1.0};
